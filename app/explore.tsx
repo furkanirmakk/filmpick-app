@@ -1,44 +1,37 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MovieItem, movies } from "./data/movies";
+import { router } from "expo-router";
+import { Ionicons, Feather } from "@expo/vector-icons";
+import { movies, MovieItem } from "./data/movies";
 
-export default function FavoritesScreen() {
-  const [favoriteMovies, setFavoriteMovies] = useState<MovieItem[]>([]);
+export default function ExploreScreen() {
+  const [searchText, setSearchText] = useState("");
 
-  const loadFavorites = async () => {
-    try {
-      const stored = await AsyncStorage.getItem("favoriteMovies");
-      const favorites: string[] = stored ? JSON.parse(stored) : [];
-      const favoriteMoviesList = movies.filter((movie) =>
-        favorites.includes(String(movie.id))
-      );
-      setFavoriteMovies(favoriteMoviesList);
-    } catch (error) {
-      console.log("Favorites load error:", error);
+  const filteredMovies = useMemo(() => {
+    const normalizedQuery = searchText.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return movies;
     }
-  };
 
-  useFocusEffect(
-    useCallback(() => {
-      loadFavorites();
-    }, [])
-  );
+    return movies.filter((movie) =>
+      movie.title.toLowerCase().includes(normalizedQuery)
+    );
+  }, [searchText]);
 
-  const renderMovieCard = ({ item }: { item: MovieItem }) => {
+  const renderMovieItem = ({ item }: { item: MovieItem }) => {
     return (
       <TouchableOpacity
-        style={styles.card}
+        style={styles.movieCard}
         activeOpacity={0.92}
         onPress={() =>
           router.push({
@@ -49,13 +42,16 @@ export default function FavoritesScreen() {
       >
         <Image source={{ uri: item.poster }} style={styles.poster} />
 
-        <View style={styles.cardContent}>
+        <View style={styles.movieInfo}>
           <View style={styles.textArea}>
-            <Text style={styles.title} numberOfLines={1}>
+            <Text style={styles.movieTitle} numberOfLines={1}>
               {item.title}
             </Text>
-            <Text style={styles.meta}>
+            <Text style={styles.movieMeta}>
               {item.genre} • {item.year}
+            </Text>
+            <Text style={styles.movieDescription} numberOfLines={2}>
+              {item.shortDescription}
             </Text>
           </View>
 
@@ -72,75 +68,84 @@ export default function FavoritesScreen() {
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <View style={styles.screen}>
         <View style={styles.topRow}>
+          <Text style={styles.headerTitle}>Keşfet</Text>
+
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => router.back()}
             activeOpacity={0.85}
+            onPress={() => setSearchText("")}
           >
-            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>Favoriler</Text>
-
-          <TouchableOpacity style={styles.iconButton} activeOpacity={0.85}>
-            <Ionicons name="heart-outline" size={20} color="#FFFFFF" />
+            <Feather name="x" size={18} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
-        {favoriteMovies.length === 0 ? (
+        <View style={styles.searchBox}>
+          <Ionicons name="search" size={18} color="#A9B7D1" />
+          <TextInput
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholder="Film ara..."
+            placeholderTextColor="#7F92B2"
+            style={styles.searchInput}
+          />
+        </View>
+
+        <Text style={styles.resultText}>
+          {searchText.trim()
+            ? `"${searchText}" için ${filteredMovies.length} sonuç`
+            : `${filteredMovies.length} film listeleniyor`}
+        </Text>
+
+        {filteredMovies.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="heart-outline" size={34} color="#A9B7D1" />
-            <Text style={styles.emptyTitle}>Henüz favori filmin yok</Text>
+            <Ionicons name="film-outline" size={34} color="#A9B7D1" />
+            <Text style={styles.emptyTitle}>Film bulunamadı</Text>
             <Text style={styles.emptyText}>
-              Film detayındaki kalp ikonuna basarak favorilerine ekleyebilirsin.
+              Başka bir isimle tekrar aramayı dene.
             </Text>
           </View>
         ) : (
           <FlatList
-            data={favoriteMovies}
+            data={filteredMovies}
             keyExtractor={(item) => item.id}
-            renderItem={renderMovieCard}
-            numColumns={2}
-            columnWrapperStyle={styles.columnWrapper}
+            renderItem={renderMovieItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
           />
         )}
 
         <View style={styles.bottomNav}>
-          <TouchableOpacity
-  style={styles.navItem}
-  activeOpacity={0.8}
-  onPress={() => router.push("/explore")}
->
-  <Feather name="search" size={20} color="#D6DCEC" />
-  <Text style={styles.navText}>Keşfet</Text>
-</TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
+            <Feather name="search" size={20} color="#FFFFFF" />
+            <Text style={[styles.navText, styles.activeNavText]}>Keşfet</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.navItem}
             activeOpacity={0.8}
             onPress={() => router.replace("/")}
           >
-            <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
-            <Text style={[styles.navText, styles.activeNavText]}>
-              Ana Sayfa
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-            <Ionicons name="heart-outline" size={20} color="#FFFFFF" />
-            <Text style={[styles.navText, styles.activeNavText]}>Favori</Text>
+            <Ionicons name="sparkles-outline" size={20} color="#D6DCEC" />
+            <Text style={styles.navText}>Ana Sayfa</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-  style={styles.navItem}
-  activeOpacity={0.8}
-  onPress={() => router.push("/profile")}
->
-  <Ionicons name="person-outline" size={20} color="#D6DCEC" />
-  <Text style={styles.navText}>Profil</Text>
-</TouchableOpacity>
+            style={styles.navItem}
+            activeOpacity={0.8}
+            onPress={() => router.push("/favorites")}
+          >
+            <Ionicons name="heart-outline" size={20} color="#D6DCEC" />
+            <Text style={styles.navText}>Favori</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navItem}
+            activeOpacity={0.8}
+            onPress={() => router.push("/profile" as any)}
+          >
+            <Ionicons name="person-outline" size={20} color="#D6DCEC" />
+            <Text style={styles.navText}>Profil</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -171,7 +176,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 18,
-    minHeight: 48,
+  },
+
+  headerTitle: {
+    color: "#FFFFFF",
+    fontSize: 26,
+    fontWeight: "800",
   },
 
   iconButton: {
@@ -185,64 +195,82 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  headerTitle: {
+  searchBox: {
+    height: 54,
+    borderRadius: 18,
+    backgroundColor: "#16243F",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    marginBottom: 14,
+    gap: 10,
+  },
+
+  searchInput: {
+    flex: 1,
     color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "800",
+    fontSize: 16,
+  },
+
+  resultText: {
+    color: "#A9B7D1",
+    fontSize: 14,
+    marginBottom: 14,
   },
 
   listContent: {
     paddingBottom: 90,
   },
 
-  columnWrapper: {
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-
-  card: {
-    width: "48%",
+  movieCard: {
     overflow: "hidden",
     borderRadius: 24,
     backgroundColor: "#182640",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
+    marginBottom: 16,
   },
 
   poster: {
     width: "100%",
-    height: 190,
+    height: 180,
     backgroundColor: "#0B1220",
   },
 
-  cardContent: {
-    paddingHorizontal: 14,
+  movieInfo: {
+    paddingHorizontal: 16,
     paddingVertical: 14,
-    position: "relative",
-    minHeight: 96,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 
   textArea: {
-    paddingRight: 54,
+    flex: 1,
+    paddingRight: 10,
   },
 
-  title: {
+  movieTitle: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "800",
     marginBottom: 6,
   },
 
-  meta: {
+  movieMeta: {
     color: "#A9B7D1",
+    fontSize: 14,
+    marginBottom: 8,
+  },
+
+  movieDescription: {
+    color: "#D5DEEE",
     fontSize: 14,
     lineHeight: 22,
   },
 
   ratingBadge: {
-    position: "absolute",
-    right: 12,
-    top: 14,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(243,180,42,0.16)",
@@ -250,6 +278,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 5,
     gap: 4,
+    alignSelf: "flex-start",
   },
 
   ratingText: {
@@ -262,8 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24,
-    paddingBottom: 60,
+    paddingBottom: 80,
   },
 
   emptyTitle: {
@@ -272,7 +300,6 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     marginTop: 14,
     marginBottom: 10,
-    textAlign: "center",
   },
 
   emptyText: {

@@ -93,10 +93,14 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-            <Feather name="search" size={20} color="#D6DCEC" />
-            <Text style={styles.navText}>Keşfet</Text>
-          </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.navItem}
+  activeOpacity={0.8}
+  onPress={() => router.push("/explore")}
+>
+  <Feather name="search" size={20} color="#D6DCEC" />
+  <Text style={styles.navText}>Keşfet</Text>
+</TouchableOpacity>
 
           <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
             <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
@@ -112,10 +116,14 @@ export default function HomeScreen() {
   <Text style={styles.navText}>Favori</Text>
 </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.8}>
-            <Ionicons name="person-outline" size={20} color="#D6DCEC" />
-            <Text style={styles.navText}>Profil</Text>
-          </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.navItem}
+  activeOpacity={0.8}
+  onPress={() => router.push("/profile")}
+>
+  <Ionicons name="person-outline" size={20} color="#D6DCEC" />
+  <Text style={styles.navText}>Profil</Text>
+</TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
