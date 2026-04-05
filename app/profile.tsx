@@ -1,156 +1,127 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Image,
   ScrollView,
+  TouchableOpacity
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons, Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import AppScreen from "@/src/components/layout/AppScreen";
+import BottomNav from "@/src/components/layout/BottomNav";
+import AppHeader from "@/src/components/layout/AppHeader";
+import ProfileStatCard from "@/src/components/profile/ProfileStatCard";
+import ProfileMenuItem from "@/src/components/profile/ProfileMenuItem";
+import { COLORS } from "@/src/constants/colors";
+import { useFavorites } from "@/src/hooks/useFavorites";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ProfileScreen() {
-  return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      <View style={styles.screen}>
-        
-        <View style={styles.header}>
-  
-  <TouchableOpacity
-    style={styles.iconButton}
-    onPress={() => router.back()}
-    activeOpacity={0.8}
-  >
-    <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
-  </TouchableOpacity>
+  const {
+    favoriteCount,
+    watchlistCount,
+    watchedCount,
+    loadAllLists,
+  } = useFavorites();
 
-  <Text style={styles.headerTitle}>Profil</Text>
-
-  <TouchableOpacity
-    style={styles.iconButton}
-    onPress={() => router.push("/settings")}
-    activeOpacity={0.8}
-  >
-    <Feather name="sliders" size={20} color="#FFFFFF" />
-  </TouchableOpacity>
-
-</View>
-
-        <ScrollView showsVerticalScrollIndicator={false}>
-          
-          <View style={styles.profileCard}>
-            <Image
-              source={{
-                uri: "https://i.pravatar.cc/300",
-              }}
-              style={styles.avatar}
-            />
-
-            <Text style={styles.name}>Furkan Irmak</Text>
-            <Text style={styles.subtitle}>Film keşfetmeyi seviyor 🎬</Text>
-          </View>
-
-          <View style={styles.statsRow}>
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>12</Text>
-              <Text style={styles.statLabel}>Favori</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>34</Text>
-              <Text style={styles.statLabel}>İzlenen</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>7</Text>
-              <Text style={styles.statLabel}>Liste</Text>
-            </View>
-          </View>
-
-          <View style={styles.menu}>
-            
-            <TouchableOpacity style={styles.menuItem}>
-              <Feather name="settings" size={20} color="#fff" />
-              <Text style={styles.menuText}>Ayarlar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <Feather name="share-2" size={20} color="#fff" />
-              <Text style={styles.menuText}>Uygulamayı Paylaş</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <Feather name="info" size={20} color="#fff" />
-              <Text style={styles.menuText}>Uygulama Hakkında</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <Feather name="info" size={20} color="#fff" />
-              <Text style={styles.menuText}>Bize Ulaş</Text>
-            </TouchableOpacity>
-
-          </View>
-
-        </ScrollView>
-
-        <View style={styles.bottomNav}>
-          
-          <TouchableOpacity
-  style={styles.navItem}
-  activeOpacity={0.8}
-  onPress={() => router.push("/explore")}
->
-  <Feather name="search" size={20} color="#D6DCEC" />
-  <Text style={styles.navText}>Keşfet</Text>
-</TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => router.replace("/")}
-          >
-            <Ionicons name="sparkles-outline" size={20} color="#D6DCEC" />
-            <Text style={styles.navText}>Ana Sayfa</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => router.push("/favorites")}
-          >
-            <Ionicons name="heart-outline" size={20} color="#D6DCEC" />
-            <Text style={styles.navText}>Favori</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="person" size={20} color="#FFFFFF" />
-            <Text style={[styles.navText, styles.activeNavText]}>Profil</Text>
-          </TouchableOpacity>
-
-        </View>
-      </View>
-    </SafeAreaView>
+  useFocusEffect(
+    useCallback(() => {
+      loadAllLists();
+    }, [loadAllLists])
   );
+
+  return (
+  <AppScreen>
+    <AppHeader
+      title="Profil"
+      leftIcon="chevron-back"
+      onLeftPress={() => router.back()}
+    />
+
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <View style={styles.profileCard}>
+        <Image
+          source={{
+            uri: "https://i.pravatar.cc/300",
+          }}
+          style={styles.avatar}
+        />
+
+        <Text style={styles.name}>Furkan Irmak</Text>
+        <Text style={styles.subtitle}>Film keşfetmeyi seviyor 🎬</Text>
+      </View>
+
+      <View style={styles.statsRow}>
+        <TouchableOpacity
+          style={styles.statCard}
+          activeOpacity={0.9}
+          onPress={() => router.push("/library/favorites")}
+        >
+          <Ionicons name="heart" size={20} color="#FF4C4C" />
+          <Text style={styles.statNumber}>{favoriteCount}</Text>
+          <Text style={styles.statLabel}>Favori</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.statCard}
+          activeOpacity={0.9}
+          onPress={() => router.push("/library/watchlist")}
+        >
+          <Ionicons name="bookmark" size={20} color="#FFD166" />
+          <Text style={styles.statNumber}>{watchlistCount}</Text>
+          <Text style={styles.statLabel}>İzlenecek</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.statCard}
+          activeOpacity={0.9}
+          onPress={() => router.push("/library/watched")}
+        >
+          <Ionicons name="checkmark-circle" size={20} color="#4CD964" />
+          <Text style={styles.statNumber}>{watchedCount}</Text>
+          <Text style={styles.statLabel}>İzlenen</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.menu}>
+        <ProfileMenuItem
+          icon="settings"
+          label="Ayarlar"
+          onPress={() => {}}
+        />
+
+        <ProfileMenuItem
+          icon="share-2"
+          label="Uygulamayı Paylaş"
+          onPress={() => {}}
+        />
+
+        <ProfileMenuItem
+          icon="info"
+          label="Uygulama Hakkında"
+          onPress={() => {}}
+        />
+
+        <ProfileMenuItem
+          icon="mail"
+          label="Bize Ulaş"
+          onPress={() => {}}
+        />
+      </View>
+    </ScrollView>
+
+    <BottomNav activeTab="profile" />
+  </AppScreen>
+);
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#020B18",
-  },
-
-  screen: {
-    flex: 1,
-    backgroundColor: "#041225",
-    paddingHorizontal: 18,
-    paddingTop: 18,
-  },
-
-
-  headerTitle: {
-    color: "#fff",
-    fontSize: 26,
-    fontWeight: "800",
+  scrollContent: {
+    paddingBottom: 120,
   },
 
   profileCard: {
@@ -166,13 +137,13 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 22,
     fontWeight: "700",
   },
 
   subtitle: {
-    color: "#A9B7D1",
+    color: COLORS.textMuted,
     marginTop: 4,
   },
 
@@ -182,87 +153,37 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
 
-  statBox: {
-    backgroundColor: "#182640",
-    paddingVertical: 18,
-    width: "30%",
-    borderRadius: 16,
-    alignItems: "center",
-  },
-
-  statNumber: {
-    color: "#F3B42A",
-    fontSize: 22,
-    fontWeight: "800",
-  },
-
-  statLabel: {
-    color: "#C7D3E8",
-    marginTop: 4,
-  },
-
   menu: {
     gap: 16,
   },
 
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: "#182640",
-    padding: 16,
-    borderRadius: 16,
-  },
-
-  menuText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  bottomNav: {
-    position: "absolute",
-    left: 18,
-    right: 18,
-    bottom: 12,
-    height: 72,
-    borderRadius: 24,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-
-  navItem: {
-    alignItems: "center",
-  },
-
-  navText: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#D6DCEC",
-  },
-
-  activeNavText: {
-    color: "#fff",
-    fontWeight: "700",
-  },
-
-  header: {
+  statsRow: {
   flexDirection: "row",
-  alignItems: "center",
   justifyContent: "space-between",
-  marginBottom: 20,
-},
+  marginBottom: 24,
+  },
 
-iconButton: {
-  width: 36,
-  height: 36,
-  borderRadius: 18,
-  backgroundColor: "rgba(255,255,255,0.08)",
-  alignItems: "center",
-  justifyContent: "center",
-},
+  statCard: {
+    flex: 1,
+    backgroundColor: "#1E2230",
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: "center",
+    marginHorizontal: 6,
+    borderWidth: 1,
+    borderColor: "#2E3348",
+  },
+
+  statNumber: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginTop: 6,
+  },
+
+  statLabel: {
+    fontSize: 13,
+    color: "#A0A4B8",
+    marginTop: 2,
+  },
 });
