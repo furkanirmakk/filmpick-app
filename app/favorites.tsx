@@ -36,7 +36,7 @@ export default function FavoritesScreen() {
           data={favoriteMovies}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <MovieCard movie={item} variant="grid" />}
-          numColumns={2}
+          numColumns={3}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
@@ -55,6 +55,6 @@ const styles = StyleSheet.create({
 
   columnWrapper: {
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: 12,
   },
 });

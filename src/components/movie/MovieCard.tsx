@@ -38,31 +38,7 @@ export default function MovieCard({
         style={isGrid ? styles.gridPoster : styles.listPoster}
       />
 
-      <View style={isGrid ? styles.gridContent : styles.listContent}>
-        <View style={styles.textArea}>
-          <Text
-            style={isGrid ? styles.gridTitle : styles.listTitle}
-            numberOfLines={1}
-          >
-            {movie.title}
-          </Text>
-
-          <Text style={styles.meta}>
-            {movie.genre} • {movie.year}
-          </Text>
-
-          {!isGrid && (
-            <Text style={styles.description} numberOfLines={2}>
-              {movie.shortDescription}
-            </Text>
-          )}
-        </View>
-
-        <View style={[styles.ratingBadge, isGrid && styles.gridRatingBadge]}>
-          <Ionicons name="star" size={12} color={COLORS.primary} />
-          <Text style={styles.ratingText}>{movie.rating}</Text>
-        </View>
-      </View>
+      
     </TouchableOpacity>
   );
 }
@@ -70,7 +46,7 @@ export default function MovieCard({
 const styles = StyleSheet.create({
   card: {
     overflow: "hidden",
-    borderRadius: 24,
+    borderRadius: 18,
     backgroundColor: COLORS.cardBackground,
     borderWidth: 1,
     borderColor: COLORS.borderSoft,
@@ -81,7 +57,8 @@ const styles = StyleSheet.create({
   },
 
   gridCard: {
-    width: "48%",
+    width: "31.5%",
+    position: "relative",
   },
 
   listPoster: {
@@ -92,7 +69,7 @@ const styles = StyleSheet.create({
 
   gridPoster: {
     width: "100%",
-    height: 190,
+    height: 170,
     backgroundColor: COLORS.posterBackground,
   },
 
@@ -101,13 +78,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-
-  gridContent: {
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    position: "relative",
-    minHeight: 96,
   },
 
   textArea: {
@@ -120,14 +90,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "800",
     marginBottom: 6,
-  },
-
-  gridTitle: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: "800",
-    marginBottom: 6,
-    paddingRight: 54,
   },
 
   meta: {
@@ -156,13 +118,20 @@ const styles = StyleSheet.create({
 
   gridRatingBadge: {
     position: "absolute",
-    right: 12,
-    top: 14,
+    top: 8,
+    right: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(12, 18, 28, 0.88)",
+    borderRadius: 999,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    gap: 4,
   },
 
   ratingText: {
     color: COLORS.primary,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
   },
 });

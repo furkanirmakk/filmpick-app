@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     bottom: 12,
     height: 72,
     borderRadius: 24,
-    backgroundColor: COLORS.navBackground,
+    backgroundColor: COLORS.appBackground,
     borderWidth: 1,
     borderColor: COLORS.borderMedium,
     flexDirection: "row",

@@ -264,6 +264,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 24,
   },
+  genreText: {
+    color: COLORS.textMuted,
+  },
 
   centerState: {
     flex: 1,

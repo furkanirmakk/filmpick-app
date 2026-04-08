@@ -76,7 +76,7 @@ export default function LibraryListScreen() {
           data={config.data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <MovieCard movie={item} variant="grid" />}
-          numColumns={2}
+          numColumns={3}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}

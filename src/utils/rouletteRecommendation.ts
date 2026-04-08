@@ -1,4 +1,4 @@
-import { getPopularMoviesMultiPage, AppMovie } from "@/src/services/tmdb";
+import { AppMovie, getPopularMoviesMultiPage } from "@/src/services/tmdb";
 
 export async function getRandomMovie(): Promise<AppMovie> {
   const movies = await getPopularMoviesMultiPage(3);
@@ -8,5 +8,11 @@ export async function getRandomMovie(): Promise<AppMovie> {
   }
 
   const randomIndex = Math.floor(Math.random() * movies.length);
-  return movies[randomIndex];
+  const selectedMovie = movies[randomIndex];
+
+  if (!selectedMovie?.id) {
+    throw new Error("Selected movie id is missing.");
+  }
+
+  return selectedMovie;
 }

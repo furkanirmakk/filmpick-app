@@ -54,9 +54,10 @@ export function useFavorites(movieId?: string) {
         loadListIds("watched"),
       ]);
 
-      setLists({ favorites, watchlist, watched });
+      const nextLists = { favorites, watchlist, watched };
+      setLists(nextLists);
 
-      return { favorites, watchlist, watched };
+      return nextLists;
     } catch (error) {
       console.log("Load all lists error:", error);
       const empty = { favorites: [], watchlist: [], watched: [] };
@@ -108,25 +109,19 @@ export function useFavorites(movieId?: string) {
   const toggleListItem = useCallback(
     async (listType: ListType, id: string) => {
       const currentIds = await loadListIds(listType);
-      let updatedIds: string[] = [];
 
-      if (currentIds.includes(id)) {
-        updatedIds = currentIds.filter((item) => item !== id);
-      } else {
-        updatedIds = [...currentIds, id];
-      }
+      const updatedIds = currentIds.includes(id)
+        ? currentIds.filter((item) => item !== id)
+        : [...currentIds, id];
 
       await saveListIds(listType, updatedIds);
 
-      const latestLists = await loadAllLists();
-
-      if (listType === "favorites") setLists((prev) => ({ ...prev, favorites: latestLists.favorites }));
-      if (listType === "watchlist") setLists((prev) => ({ ...prev, watchlist: latestLists.watchlist }));
-      if (listType === "watched") setLists((prev) => ({ ...prev, watched: latestLists.watched }));
+      await loadAllLists();
+      await loadMoviesForList(listType);
 
       return updatedIds.includes(id);
     },
-    [loadAllLists, loadListIds, saveListIds]
+    [loadAllLists, loadListIds, loadMoviesForList, saveListIds]
   );
 
   useEffect(() => {
@@ -153,6 +148,9 @@ export function useFavorites(movieId?: string) {
     favoriteMovies,
     watchlistMovies,
     watchedMovies,
+    favoriteIds: lists.favorites,
+    watchlistIds: lists.watchlist,
+    watchedIds: lists.watched,
     favoriteCount: lists.favorites.length,
     watchlistCount: lists.watchlist.length,
     watchedCount: lists.watched.length,

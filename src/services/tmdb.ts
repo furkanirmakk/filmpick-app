@@ -158,14 +158,14 @@ export async function getNowPlayingMovies(
 export async function getPopularMoviesMultiPage(
   totalPages = 3
 ): Promise<AppMovie[]> {
-  const requests = [];
+  const requests: Promise<PaginatedMoviesResponse>[] = [];
 
   for (let page = 1; page <= totalPages; page++) {
     requests.push(getPopularMovies(page));
   }
 
   const results = await Promise.all(requests);
-  return results.flat();
+  return results.flatMap((pageData) => pageData.movies);
 }
 
 export async function searchMovies(
